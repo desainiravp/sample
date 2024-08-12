@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  redis_cerebro:
+    image: redis:5.0.9-alpine
+    container_name: cerebro_redis
+    volumes:
+        - ./container/001-redis/data:/data
+    networks:
+      sls-cerebro-tier:
+          ipv4_address: 172.30.0.3
+    restart: always
+
+  mariadb_cerebro:
+    image: mariadb:10.4
+    container_name: cerebro_mariadb
+    volumes:
+      - ./container/002-maria/my.conf:/etc/mysql/my.conf
+      - ./container/002-maria/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rsteve
+      MYSQL_DATABASE: cerebrodb
+      MYSQL_USER: stevetest
+      MYSQL_PASSWORD: steve
+    restart: always
+    networks:
+      sls-cerebro-tier:
+          ipv4_address: 172.30.0.4
+
+networks:
+  sls-cerebro-tier:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+          - subnet: 172.30.0.0/16
